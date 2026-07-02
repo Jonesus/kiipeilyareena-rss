@@ -6,10 +6,12 @@ on:
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  generate-feed:
+  generate-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -47,14 +49,7 @@ jobs:
           </html>
           EOF
 
-      - name: Commit and push if changed
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add feed.xml index.html
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update RSS feed [skip ci]"
-            git push
-          fi
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
