@@ -30,24 +30,21 @@ jobs:
 
       - name: Create index.html for GitHub Pages
         run: |
-          cat > index.html << 'EOF'
-          <!DOCTYPE html>
-          <html lang="fi">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Kiipeilyareena - Ajankohtaista RSS</title>
-              <style>
-                  body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; text-align: center; }
-                  a { color: #0066cc; }
-              </style>
-          </head>
-          <body>
-              <h1>Kiipeilyareena - Ajankohtaista</h1>
-              <p>RSS feed: <a href="feed.xml">feed.xml</a></p>
-          </body>
-          </html>
-          EOF
+          echo '<!DOCTYPE html>' > index.html
+          echo '<html lang="fi">' >> index.html
+          echo '<head>' >> index.html
+          echo '  <meta charset="UTF-8">' >> index.html
+          echo '  <meta name="viewport" content="width=device-width, initial-scale=1.0">' >> index.html
+          echo '  <title>Kiipeilyareena - Ajankohtaista RSS</title>' >> index.html
+          echo '</head>' >> index.html
+          echo '<body>' >> index.html
+          echo '  <h1>Kiipeilyareena - Ajankohtaista</h1>' >> index.html
+          echo '  <p>RSS feed: <a href="feed.xml">feed.xml</a></p>' >> index.html
+          echo '</body>' >> index.html
+          echo '</html>' >> index.html
+
+      - name: Clean up
+        run: rm -rf .venv __pycache__
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
