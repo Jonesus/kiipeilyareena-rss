@@ -1,0 +1,60 @@
+name: Generate RSS Feed
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Run hourly
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  generate-feed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Generate RSS feed
+        run: uv run python scraper.py
+
+      - name: Create index.html for GitHub Pages
+        run: |
+          cat > index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="fi">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Kiipeilyareena - Ajankohtaista RSS</title>
+              <style>
+                  body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; text-align: center; }
+                  a { color: #0066cc; }
+              </style>
+          </head>
+          <body>
+              <h1>Kiipeilyareena - Ajankohtaista</h1>
+              <p>RSS feed: <a href="feed.xml">feed.xml</a></p>
+          </body>
+          </html>
+          EOF
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add feed.xml index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update RSS feed [skip ci]"
+            git push
+          fi
